@@ -21,11 +21,27 @@ class CreateTransactionService {
     value,
     category,
   }: Request): Promise<Transaction> {
+    if (!['income', 'outcome'].includes(type)) {
+      throw new AppError(
+        "Invalid transaction type. Type needs to be an 'income' or 'outcome'.",
+      );
+    }
+
+    if (!Number.isFinite(value)) {
+      throw new AppError('Invalid value type. Value needs to be a number.');
+    }
+
     const transactionsRepository = getCustomRepository(TransactionsRepository);
     const categoryRepository = getRepository(Category);
 
     let transactionCategory;
     let transactionDetails;
+
+    const { total } = await transactionsRepository.getBalance();
+
+    if (type === 'outcome' && total < value) {
+      throw new AppError('Not enough balance to perform this transaction.');
+    }
 
     if (category === '') {
       transactionDetails = {
