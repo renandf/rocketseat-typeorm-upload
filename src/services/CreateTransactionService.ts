@@ -32,7 +32,7 @@ class CreateTransactionService {
     }
 
     const transactionsRepository = getCustomRepository(TransactionsRepository);
-    const categoryRepository = getRepository(Category);
+    const categoriesRepository = getRepository(Category);
 
     let transactionCategory;
     let transactionDetails;
@@ -50,18 +50,18 @@ class CreateTransactionService {
         value,
       };
     } else {
-      transactionCategory = await categoryRepository.findOne({
+      transactionCategory = await categoriesRepository.findOne({
         where: {
           title: category,
         },
       });
 
       if (!transactionCategory) {
-        transactionCategory = categoryRepository.create({
+        transactionCategory = categoriesRepository.create({
           title: category,
         });
 
-        await categoryRepository.save(transactionCategory);
+        await categoriesRepository.save(transactionCategory);
       }
 
       transactionDetails = {
